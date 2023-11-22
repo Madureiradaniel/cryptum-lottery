@@ -25,6 +25,8 @@ The Cryptum infrastructure allows clients to integrate and interact with the mos
 
 Chainlink is the industry-standard Web3 services platform that has enabled trillions of dollars in transaction volume across DeFi, insurance, gaming, NFTs, and other major industries. As the leading decentralized oracle network, Chainlink enables developers to build feature-rich Web3 applications with seamless access to real-world data and off-chain computation across any blockchain and provides global enterprises with a universal gateway to all blockchains.
 
+[Read more about the Chainlink integration](docs/chainlink.md).
+
 ## Playground
 
 Use this playground to simulate bets and observe the functionality of Chainlink VRF generating random numbers every 100 mined blocks on the POLYGON network - MUMBAI.
@@ -39,8 +41,6 @@ If the game is paused, you can press to initiate the number generation.
 
 - MATIC - https://mumbaifaucet.com/
 - LINK - https://faucets.chain.link/mumbai
-
-[Read more about the Chainlink integration](docs/chainlink.md).
 
 
 ## First Steps
