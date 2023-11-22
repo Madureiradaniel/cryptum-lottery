@@ -8,6 +8,12 @@ const Cryptum = require("../service/Cryptum")
 cron.schedule("* * * * *", async () => {
     try{
         const bets = await Bet.listAll()
+
+        if(bets.length == 0){
+            logger.info({ message: "Bets not found!"})
+            return  
+        }
+
         const lottery = await Lottery.findActiveLottery()
         
         if(!lottery){

@@ -1,0 +1,25 @@
+version: "3"
+
+services:
+  web:
+    build:
+      context: ./web
+    container_name: "web"
+    ports:
+      - "4003:4003"
+ 
+  app:
+    build: .
+    ports:
+      - 8080:8080
+    restart: always
+    container_name: "app"
+
+  db:
+    image: mongo:6.0.11
+    ports:
+      - 27017:27017
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example

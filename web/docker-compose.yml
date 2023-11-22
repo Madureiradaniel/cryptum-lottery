@@ -1,8 +1,0 @@
-version: "3"
-
-services:
-  zeus-painel-financeiro:
-    build: .
-    container_name: "marcar-motoboy"
-    ports:
-      - "4003:4003"
