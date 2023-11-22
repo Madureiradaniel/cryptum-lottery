@@ -16,7 +16,7 @@ exports.createAutomation = async (req, res) => {
 
     const hash = await Cryptum.createAutomation()
     const contractAddress = await Cryptum.getContractAddress(hash)
-    await Cryptum.tranferTokens("20", contractAddress)
+    await Cryptum.tranferTokens("10", contractAddress)
 
     await Lottery.updateLottery(idLottery, {
         upkeepContract: contractAddress
@@ -64,7 +64,7 @@ exports.registerUpkeep = async (req, res) => {
         checkData: '0x',
         triggerConfig: '0x',
         offchainConfig: '0x',
-        amount: '20' // lINK
+        amount: '10' // lINK
     })
 
     await Cryptum.getContractAddress(hash)

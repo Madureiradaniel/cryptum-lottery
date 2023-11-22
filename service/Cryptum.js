@@ -58,7 +58,7 @@ module.exports = class {
             protocol,
             address,
             wallet,
-            amount: 20
+            amount: 10
         })
         logger.info({ hash })
         return hash
