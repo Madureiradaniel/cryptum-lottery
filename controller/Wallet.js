@@ -2,6 +2,9 @@ const logger = require("../logger")
 const Wallet = require("../service/Wallet")
 const Cryptum = require("../service/Cryptum")
 
+/**
+ * Implementation mentioned in: https://github.com/cryptum-official/cryptum-sdk/blob/master/docs/chainlink/examples/lottery.md#step-3
+ */
 exports.findOrCreateWalletByEmail = async (req, res) => {
     try {
         const { email } = req.body;

@@ -1,5 +1,6 @@
 const Lottery = require("../service/Lottery")
 const Cryptum = require("../service/Cryptum")
+const logger = require("../logger")
 
 exports.findOrCreateLottery = async (req, res) => {
     const lottery = await Lottery.findActiveLottery()
@@ -7,6 +8,10 @@ exports.findOrCreateLottery = async (req, res) => {
     const new_lottery = await Lottery.createLottery()
     res.send(new_lottery)
 }
+
+/**
+ * Implementation mentioned in: https://github.com/cryptum-official/cryptum-sdk/blob/master/docs/chainlink/examples/lottery.md#step-6
+ */
 
 exports.createAutomation = async (req, res) => {
     const { idLottery } = req.body;
@@ -26,6 +31,9 @@ exports.createAutomation = async (req, res) => {
 }
 
 
+/**
+ * Implementation mentioned in: https://github.com/cryptum-official/cryptum-sdk/blob/master/docs/chainlink/examples/lottery.md#step-4
+ */
 exports.createSubscription = async (req, res) => {
     const { idLottery } = req.body;
 
@@ -49,6 +57,9 @@ exports.createSubscription = async (req, res) => {
     res.send(subscriptionVRF)
 }
 
+/**
+ * Implementation mentioned in: https://github.com/cryptum-official/cryptum-sdk/blob/master/docs/chainlink/examples/lottery.md#step-8
+ */
 exports.registerUpkeep = async (req, res) => {
     const { idLottery } = req.body;
     const lottery = await Lottery.getLotteryById(idLottery)
@@ -78,6 +89,9 @@ exports.registerUpkeep = async (req, res) => {
     res.send({ hash, upkeepId: upkeep[0] })
 }
 
+/**
+ * Implementation mentioned in: https://github.com/cryptum-official/cryptum-sdk/blob/master/docs/chainlink/examples/lottery.md#step-10
+ */
 exports.getLottery = async (req, res) => {
     try {
         const { id } = req.params;
@@ -114,39 +128,54 @@ exports.getLottery = async (req, res) => {
 }
 
 exports.pauseLottery = async (req, res) => {
-    const { id } = req.params;
-    const lottery = await Lottery.getLotteryById(id)
-    if (!lottery) return res.status(404).send({ error: true, message: "Not found!" })
-    const hash = await Cryptum.pauseUpkeep(lottery.upkeepId)
-    res.send({ hash })
+    try {
+        const { id } = req.params;
+        const lottery = await Lottery.getLotteryById(id)
+        if (!lottery) return res.status(404).send({ error: true, message: "Not found!" })
+        const hash = await Cryptum.pauseUpkeep(lottery.upkeepId)
+        res.send({ hash })
+    } catch (e) {
+        logger.error(e)
+        res.status(500).send({ error: true })
+    }
 }
 
 exports.unpauseLottery = async (req, res) => {
-    const { id } = req.params;
-    const lottery = await Lottery.getLotteryById(id)
-    if (!lottery) return res.status(404).send({ error: true, message: "Not found!" })
-    const hash = await Cryptum.unpauseUpkeep(lottery.upkeepId)
-    res.send({ hash })
+    try {
+        const { id } = req.params;
+        const lottery = await Lottery.getLotteryById(id)
+        if (!lottery) return res.status(404).send({ error: true, message: "Not found!" })
+        const hash = await Cryptum.unpauseUpkeep(lottery.upkeepId)
+        res.send({ hash })
+    } catch (e) {
+        logger.error(e)
+        res.status(500).send({ error: true })
+    }
 }
 
 exports.getLatestRandomWord = async (req, res) => {
-    const { id } = req.params;
-    const lottery = await Lottery.getLotteryById(id)
-    if (!lottery) return res.status(404).send({ error: true, message: "Not found!" })
+    try {
+        const { id } = req.params;
+        const lottery = await Lottery.getLotteryById(id)
+        if (!lottery) return res.status(404).send({ error: true, message: "Not found!" })
 
-    const subscription = await Cryptum.getSubscriptionVRF(lottery.subscriptionContract)
-    const latestRequestID = await Cryptum.getLatestRequestVRF(lottery.subscriptionContract)
+        const subscription = await Cryptum.getSubscriptionVRF(lottery.subscriptionContract)
+        const latestRequestID = await Cryptum.getLatestRequestVRF(lottery.subscriptionContract)
 
-    if (latestRequestID != lottery.latestRequestID) {
-        await Lottery.updateLottery(id, { latestRequestID: latestRequestID })
+        if (latestRequestID != lottery.latestRequestID) {
+            await Lottery.updateLottery(id, { latestRequestID: latestRequestID })
+        }
+
+        const randomWords = await Cryptum.getRandomWord(lottery.subscriptionContract, latestRequestID)
+
+        res.send({
+            subscription,
+            requestIdOld: lottery.latestRequestID,
+            requestId: latestRequestID,
+            ...randomWords
+        })
+    } catch (e) {
+        logger.error(e)
+        res.status(500).send({ error: true })
     }
-
-    const randomWords = await Cryptum.getRandomWord(lottery.subscriptionContract, latestRequestID)
-
-    res.send({
-        subscription,
-        requestIdOld: lottery.latestRequestID,
-        requestId: latestRequestID,
-        ...randomWords
-    })
 }

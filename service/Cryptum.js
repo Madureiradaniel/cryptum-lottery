@@ -4,6 +4,9 @@ const protocol = process.env.PROTOCOL
 const logger = require("../logger")
 const { delay } = require('./utils')
 
+/**
+ * Implementation mentioned in: https://github.com/cryptum-official/cryptum-sdk/blob/master/docs/chainlink/examples/lottery.md#step-1
+ */
 const sdk = new CryptumSDK({
     environment: "testnet", // 'testnet' or 'development', 'mainnet' or 'production'
     apiKey: process.env.API_KEY,
